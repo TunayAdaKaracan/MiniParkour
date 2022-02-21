@@ -1,0 +1,9 @@
+name: MiniParkour
+version: '${project.version}'
+main: dev.kutuptilkisi.miniparkour.MiniParkour
+api-version: 1.17
+authors: [ Kutup_Tilkisi ]
+description: A Little Parkour Game
+website: kutuptilkisi.dev
+commands:
+  park:
