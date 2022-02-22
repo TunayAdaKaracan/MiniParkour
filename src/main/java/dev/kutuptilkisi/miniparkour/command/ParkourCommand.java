@@ -2,7 +2,6 @@ package dev.kutuptilkisi.miniparkour.command;
 
 import dev.kutuptilkisi.miniparkour.MiniParkour;
 import dev.kutuptilkisi.miniparkour.instance.Game;
-import dev.kutuptilkisi.miniparkour.manager.ParkourManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,7 +10,7 @@ import org.bukkit.entity.Player;
 
 public class ParkourCommand implements CommandExecutor {
 
-    private MiniParkour mp;
+    private final MiniParkour mp;
 
     public ParkourCommand(MiniParkour mp){
         this.mp = mp;

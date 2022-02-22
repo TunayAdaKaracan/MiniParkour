@@ -1,28 +1,29 @@
 package dev.kutuptilkisi.miniparkour.instance;
 
-import dev.kutuptilkisi.miniparkour.MiniParkour;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Game {
 
-    private static final Material complete = Material.TERRACOTTA;
-    private static final Material goal = Material.EMERALD_BLOCK;
+    private static final Material COMPLETE = Material.TERRACOTTA;
+    private static final Material GOAL = Material.EMERALD_BLOCK;
 
 
-    private UUID player;
+    private final UUID player;
     private int point;
-    private Location spawn;
+    private final Location spawn;
 
-    private List<Block> blocks;
+    private final Block startBlock;
+
+    private final LinkedList<Block> blocks;
 
     public Game(Player p){
 
@@ -30,10 +31,11 @@ public class Game {
         this.point = 0;
         this.spawn = p.getLocation();
 
-        this.blocks = new ArrayList<>();
+        this.blocks = new LinkedList<>();
 
         Block start = p.getLocation().getBlock().getRelative(0, -1, 0);
-        start.setType(complete);
+        this.startBlock = start;
+
         this.blocks.add(start);
 
         createBlock();
@@ -42,8 +44,7 @@ public class Game {
         GETTERS
      */
 
-    public UUID getPlayer(){return player;}
-    public Block getLastBlock(){return blocks.get(blocks.size()-1);}
+    public Block getLastBlock(){return blocks.getLast();}
 
     /*
         CORE
@@ -65,25 +66,12 @@ public class Game {
         }
 
         if(empty.size() == 0){
-            // err message
+            //err
         } else {
-            Block randomBlock = empty.get(new Random().nextInt(empty.size())).getBlock();
-            randomBlock.setType(goal);
+            Block randomBlock = empty.get(ThreadLocalRandom.current().nextInt(empty.size())).getBlock();
+            randomBlock.setType(GOAL);
             blocks.add(randomBlock);
         }
-
-
-        /*
-        Random random = new Random();
-
-        List<Integer> vertical = Arrays.asList(4, 3, 2, -2, -3, -4);
-        List<Integer> horizontal = Arrays.asList(-1, 0, 1);
-
-        Block block = getLastBlock().getRelative(vertical.get(random.nextInt(vertical.size())),
-                                                 horizontal.get(random.nextInt(horizontal.size())),
-                                                 vertical.get(random.nextInt(vertical.size())));
-        block.setType(goal);
-        blocks.add(block); */
     }
 
     /*
@@ -91,13 +79,15 @@ public class Game {
      */
 
     public void addPoint(){
-        blocks.get(0).setType(Material.AIR);
-        blocks.remove(0);
+        if(!blocks.getFirst().equals(startBlock)) {
+            blocks.getFirst().setType(Material.AIR);
+        }
+        blocks.removeFirst();
 
-        getLastBlock().setType(complete);
+        getLastBlock().setType(COMPLETE);
 
         createBlock();
-
+        //noinspection ConstantConditions
         Bukkit.getPlayer(player).sendMessage(ChatColor.GREEN + "+1 Point");
         point++;
     }
@@ -105,11 +95,15 @@ public class Game {
     public void lostGame(boolean force){
         if(!force) {
             Player p = Bukkit.getPlayer(player);
+
+            //noinspection ConstantConditions
             p.teleport(spawn);
             p.sendMessage(ChatColor.GOLD + "Total Points: " + point);
         }
         for (Block block : blocks) {
-            block.setType(Material.AIR);
+            if(!block.equals(startBlock)) {
+                block.setType(Material.AIR);
+            }
         }
     }
 

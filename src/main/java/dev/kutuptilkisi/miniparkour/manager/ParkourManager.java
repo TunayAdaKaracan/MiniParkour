@@ -8,21 +8,14 @@ import java.util.UUID;
 
 public class ParkourManager {
 
-    public HashMap<UUID, Game> games;
+    public final HashMap<UUID, Game> games;
 
     public ParkourManager(){
         this.games = new HashMap<>();
     }
 
     public Game getGame(Player p){
-
-        for(Game game : games.values()){
-            if(game.getPlayer().equals(p.getUniqueId())){
-                return game;
-            }
-        }
-
-        return null;
+        return games.get(p.getUniqueId());
     }
 
 }
